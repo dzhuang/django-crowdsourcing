@@ -1,8 +1,9 @@
 from __future__ import absolute_import
 
+import six
 import unicodecsv as csv
 from datetime import datetime
-import httplib
+from six.moves import http_client
 from itertools import count
 import logging
 import smtplib
@@ -15,7 +16,7 @@ from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render_to_response, render
 from django.template import RequestContext as _rc
 from django.utils.html import escape
 
@@ -83,13 +84,15 @@ def _survey_submit(request, survey):
         return HttpResponseRedirect(_login_url(request))
     if not hasattr(request, 'session'):
         return HttpResponse("Cookies must be enabled to use this application.",
-                            status=httplib.FORBIDDEN)
+                            status=http_client.FORBIDDEN)
     if (_entered_no_more_allowed(request, survey)):
         slug_template = 'crowdsourcing/%s_already_submitted.html' % survey.slug
-        return render_to_response([slug_template,
-                                   'crowdsourcing/already_submitted.html'],
-                                  dict(survey=survey),
-                                  _rc(request))
+        return render(
+            request,
+            [slug_template,
+             'crowdsourcing/already_submitted.html'],
+            dict(survey=survey),
+        )
 
     forms = forms_for_survey(survey, request)
 
@@ -172,14 +175,14 @@ def _send_survey_email(request, survey, submission):
 def _survey_show_form(request, survey, forms):
     specific_template = 'crowdsourcing/%s_survey_detail.html' % survey.slug
     entered = _user_entered_survey(request, survey)
-    return render_to_response([specific_template,
-                               'crowdsourcing/survey_detail.html'],
-                              dict(survey=survey,
-                                   forms=forms,
-                                   entered=entered,
-                                   login_url=_login_url(request),
-                                   request=request),
-                              _rc(request))
+    return render(request=request, template_name=[specific_template,
+                   'crowdsourcing/survey_detail.html'],
+                  context=dict(survey=survey,
+                       forms=forms,
+                       entered=entered,
+                       login_url=_login_url(request),
+                       ),
+                  )
 
 
 def _can_show_form(request, survey):
@@ -223,12 +226,13 @@ def embeded_survey_questions(request, slug):
         if request.method == 'POST':
             if _submit_valid_forms(forms, request, survey):
                 forms = ()
-    return render_to_response(templates, dict(
-        entered=_user_entered_survey(request, survey),
-        request=request,
-        forms=forms,
-        survey=survey,
-        login_url=_login_url(request)), _rc(request))
+    return render(request, template_name=templates,
+                  context=dict(
+                      entered=_user_entered_survey(request, survey),
+                      forms=forms,
+                      survey=survey,
+                      login_url=_login_url(request)),
+                  )
 
 
 def _survey_results_redirect(request, survey, thanks=False):
@@ -246,7 +250,7 @@ def _survey_report_url(survey):
 def allowed_actions(request, slug):
     survey = _get_survey_or_404(slug, request)
     authenticated = request.user.is_authenticated()
-    response = HttpResponse(mimetype='application/json')
+    response = HttpResponse(content_type='application/json')
     dump({"enter": _can_show_form(request, survey),
           "view": survey.can_have_public_submissions(),
           "open": survey.is_open,
@@ -255,7 +259,7 @@ def allowed_actions(request, slug):
 
 
 def questions(request, slug):
-    response = HttpResponse(mimetype='application/json')
+    response = HttpResponse(content_type='application/json')
     dump(_get_survey_or_404(slug, request).to_jsondata(), response)
     return response
 
@@ -395,10 +399,10 @@ def submissions(request, format):
         return sorted(key_lookup.keys())
 
     if format == 'json':
-        response = HttpResponse(mimetype='application/json')
+        response = HttpResponse(content_type='application/json')
         dump(result_data, response)
     elif format == 'csv':
-        response = HttpResponse(mimetype='text/csv')
+        response = HttpResponse(content_type='text/csv')
         writer = csv.writer(response)
         keys = get_keys()
         writer.writerow(keys)
@@ -419,7 +423,7 @@ def submissions(request, format):
                     cell = doc.createElement(key)
                     submission.appendChild(cell)
                     cell.appendChild(doc.createTextNode(u"%s" % value))
-        response = HttpResponse(doc.toxml(), mimetype='text/xml')
+        response = HttpResponse(doc.toxml(), content_type='text/xml')
     elif format == 'html': # mostly for debugging.
         keys = get_keys()
         results = [
@@ -447,7 +451,7 @@ def _encode(possible):
 def submission(request, id):
     template = 'crowdsourcing/submission.html'
     sub = get_object_or_404(Submission.objects, is_public=True, pk=id)
-    return render_to_response(template, dict(submission=sub), _rc(request))
+    return render(request, template, dict(submission=sub))
 
 
 def _default_report(survey):
@@ -475,12 +479,16 @@ def _default_report(survey):
             type = SURVEY_DISPLAY_TYPE_CHOICES.MAP
         elif field.option_type == OTC.PHOTO:
             type = SURVEY_DISPLAY_TYPE_CHOICES.SLIDESHOW
+        if six.PY2:
+            order = field_count.next()
+        else:
+            order = field_count.__next__()
         displays.append(SurveyReportDisplay(
             report=report,
             display_type=type,
             fieldnames=field.fieldname,
             annotation=field.label,
-            order=field_count.next()))
+            order=order))
     report.survey_report_displays = displays
     return report
 
@@ -576,9 +584,9 @@ def _survey_report(request, slug, report, page, templates):
         page_answers=page_answers,
         is_public=is_public,
         display_individual_results=display_individual_results,
-        request=request)
+        )
 
-    return render_to_response(templates, context, _rc(request))
+    return render(request, templates, context)
 
 
 def pages_to_link_from_paginator(page, paginator):
@@ -616,7 +624,7 @@ def paginate_or_404(queryset, page, num_per_page=20):
     paginator = Paginator(queryset, num_per_page)
     try:
         page_obj = paginator.page(page)
-    except EmptyPage, InvalidPage:
+    except (EmptyPage, InvalidPage):
         raise Http404
     return paginator, page_obj
 
@@ -679,7 +687,7 @@ def location_question_results(
         if answer.submission_id in icon_lookup:
             d["icon"] = icon_lookup[answer.submission_id]
         entries.append(d)
-    response = HttpResponse(mimetype='application/json')
+    response = HttpResponse(content_type='application/json')
     dump({"entries": entries}, response)
     return response
 
@@ -724,4 +732,4 @@ def submission_for_map(request, id):
         sub = get_object_or_404(Submission.objects, pk=id)
     else:
         sub = get_object_or_404(Submission.objects, is_public=True, pk=id)
-    return render_to_response(template, dict(submission=sub), _rc(request))
+    return render(request, template, dict(submission=sub))

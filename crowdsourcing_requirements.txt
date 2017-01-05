@@ -4,13 +4,18 @@
 # $ pip install -r crowdsourcing_requirements.txt
 
 # Python Image Library for processing image answers.
-PIL>=1.1.6
+#PIL>=1.1.6
+pillow
+
+# for OEmbed
+python-oembed
 
 # for image thumbnailing
 sorl-thumbnail==3.2.5
 
 # for ordering inlines
--e git://github.com/jpwatts/django-positions.git#egg=django-positions
+django-positions
+#-e git://github.com/jpwatts/django-positions.git#egg=django-positions
 
 # for unicode csv writer support
 unicodecsv
@@ -28,3 +33,6 @@ flickrapi
 # For asynchronously synching Flickr. Sync synchronously by default.
 # carrot>=0.10.3
 # celery==1.0.2
+
+# templating
+django_forms_bootstrap

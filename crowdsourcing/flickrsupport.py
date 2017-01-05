@@ -3,7 +3,7 @@ support for mirroring submitted photos on Flickr.
 """
 from __future__ import absolute_import
 import logging
-from urllib2 import URLError
+from six.moves.urllib.error import URLError
 
 from django.core.cache import cache
 

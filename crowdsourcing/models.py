@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 
+import six
 import datetime
 import logging
 from math import sin, cos
@@ -242,6 +243,9 @@ class Survey(models.Model):
     def __unicode__(self):
         return self.title
 
+    if six.PY3:
+        __str__ = __unicode__
+
     @models.permalink
     def get_absolute_url(self):
         return ('survey_detail', (), {'slug': self.slug})
@@ -380,6 +384,9 @@ class Question(models.Model):
     def __unicode__(self):
         return self.question
 
+    if six.PY3:
+        __str__ = __unicode__
+
     def save(self, *args, **kwargs):
         self.numeric_is_int = True
         OTC = OPTION_TYPE_CHOICES
@@ -399,11 +406,11 @@ class Question(models.Model):
     def parsed_options(self):
         if OPTION_TYPE_CHOICES.BOOL == self.option_type:
             return [True, False]
-        return filter(None, (s.strip() for s in self.options.splitlines()))
+        return list(filter(None, (s.strip() for s in self.options.splitlines())))
 
     @property
     def parsed_map_icons(self):
-        return filter(None, (s.strip() for s in self.map_icons.splitlines()))
+        return list(filter(None, (s.strip() for s in self.map_icons.splitlines())))
 
     def parsed_option_icon_pairs(self):
         options = self.parsed_options
@@ -464,6 +471,9 @@ class Section(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    if six.PY3:
+        __str__ = __unicode__
 
 
 class Filter:
@@ -754,7 +764,7 @@ BALLOT_STUFFING_FIELDS = ('ip_address', 'session_key',)
 class Submission(models.Model):
     survey = models.ForeignKey(Survey)
     user = models.ForeignKey(User, blank=True, null=True)
-    ip_address = models.IPAddressField()
+    ip_address = models.GenericIPAddressField()
     submitted_at = models.DateTimeField(default=datetime.datetime.now)
     session_key = models.CharField(max_length=40, blank=True, editable=False)
     featured = models.BooleanField(default=False)
@@ -808,7 +818,7 @@ class Submission(models.Model):
         return self.get_answer_dict().items()
 
     def get_absolute_url(self):
-        view = 'crowdsourcing.views.submission'
+        view = 'single_submission'
         return reverse(view, kwargs={"id": self.pk})
 
     @property
@@ -817,6 +827,9 @@ class Submission(models.Model):
 
     def __unicode__(self):
         return u"%s Submission" % self.survey.title
+
+    if six.PY3:
+        __str__ = __unicode__
 
 
 class Answer(models.Model):
@@ -832,7 +845,7 @@ class Answer(models.Model):
         max_length=500,
         blank=True,
         thumbnail=image_answer_thumbnail_meta,
-        extra_thumbnails=local_settings.EXTRA_THUMBNAILS,
+        #extra_thumbnails=local_settings.EXTRA_THUMBNAILS,
         upload_to=local_settings.IMAGE_UPLOAD_PATTERN)
     latitude = models.FloatField(blank=True, null=True)
     longitude = models.FloatField(blank=True, null=True)
@@ -882,7 +895,10 @@ class Answer(models.Model):
         super(Answer, self).save(**kwargs)
 
     def __unicode__(self):
-        return unicode(self.question)
+        return six.text_type(self.question)
+
+    if six.PY3:
+        __str__ = __unicode__
 
     def _sync_self_to_flickr(self):
         """ Does not save. You must save after syncing. """
@@ -988,6 +1004,9 @@ class SurveyReport(models.Model):
     def __unicode__(self):
         return self.get_title()
 
+    if six.PY3:
+        __str__ = __unicode__
+
 
 SURVEY_DISPLAY_TYPE_CHOICES = ChoiceEnum(
     'text pie map bar line slideshow download')
@@ -1062,6 +1081,9 @@ class SurveyReportDisplay(models.Model):
         elif self.fieldnames:
             return_value.append(self.fieldnames)
         return " ".join(return_value)
+
+    if six.PY3:
+        __str__ = __unicode__
 
     def questions(self, fields=None):
         return self._get_questions(self.fieldnames, fields)

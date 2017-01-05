@@ -1,10 +1,10 @@
 from __future__ import absolute_import
 
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import url
 
 from .views import home
 
-urlpatterns = patterns(
-    "",
+urlpatterns = [
+    #"",
     url(r'^$', home)
-    )
+    ]

@@ -1,4 +1,4 @@
-import cStringIO
+from six.moves import cStringIO
 import logging
 import sys
 

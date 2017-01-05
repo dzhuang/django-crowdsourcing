@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import re
+from functools import reduce
 
 from django.conf import settings
 from django.core.files.images import get_image_dimensions
@@ -76,7 +77,7 @@ class BaseAnswerForm(Form):
     def save(self, commit=True):
         if self.cleaned_data['answer'] is None:
             if self.fields['answer'].required:
-                raise ValidationError, _('This field is required.')
+                raise ValidationError(_('This field is required.'))
             return
         ans = Answer()
         if self.submission:
@@ -139,7 +140,7 @@ class VideoAnswer(BaseAnswerForm):
                 if oembed_expand(value):
                     return value
                 else:
-                    print "Couldn't expand %s" % value
+                    print("Couldn't expand %s" % value)
             else:
                 matches = [re.match(v, value) for v in VIDEO_URL_PATTERNS]
                 first_match = reduce(lambda x, y: x or y, matches)
@@ -194,7 +195,7 @@ class BaseOptionAnswer(BaseAnswerForm):
     def clean_answer(self):
         key = self.cleaned_data['answer']
         if not key and self.fields['answer'].required:
-            raise ValidationError, _('This field is required.')
+            raise ValidationError(_('This field is required.'))
         if not isinstance(key, (list, tuple)):
             key = (key,)
         return key

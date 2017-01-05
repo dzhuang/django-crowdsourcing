@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import url
 
 from .views import (allowed_actions,
                     embeded_survey_questions,
@@ -14,8 +14,8 @@ from .views import (allowed_actions,
                     survey_detail,
                     survey_report)
 
-urlpatterns = patterns(
-    "",
+urlpatterns = [
+#    "",
     url(r'^submissions/$',
         submissions,
         {"format": "json"},
@@ -26,7 +26,9 @@ urlpatterns = patterns(
         name='submissions_by_format'),
 
     url(r'^submission/(?P<id>\d+)/$',
-        submission),
+        submission,
+        name='single_submission'
+        ),
 
     url(r'^submission_for_map/(?P<id>\d+)/$',
         submission_for_map),
@@ -87,4 +89,4 @@ urlpatterns = patterns(
     url(r'^(?P<slug>[-a-z0-9_]+)/(?P<report>[-a-z0-9_]+)/(?P<page>\d+)/$',
         survey_report,
         name="survey_report")
-    )
+    ]

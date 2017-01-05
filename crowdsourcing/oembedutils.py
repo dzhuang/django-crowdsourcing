@@ -6,7 +6,7 @@ The configuration is extracted from django-oembed's initial_data.json fixture.
 This code uses python-oembed with a patch to permit true regex input.
 """
 import re
-import urllib2
+from six.moves.urllib.error import HTTPError
 
 import oembed
 
@@ -107,5 +107,5 @@ for d in config:
 def oembed_expand(url, **opts):
     try:
         return _consumer.embed(url, **opts).getData()
-    except (oembed.OEmbedError, urllib2.HTTPError):
+    except (oembed.OEmbedError, HTTPError):
         return None
