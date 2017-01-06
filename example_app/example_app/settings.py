@@ -73,13 +73,6 @@ ADMIN_MEDIA_PREFIX = '/media/admin/'
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '%n@##5o0%d@qd5l4^+(zt5ih@90a7ch4k3m7a^!5unw45)i=ly'
 
-# List of callables that know how to import templates from various sources.
-# TEMPLATE_LOADERS = (
-#     #'django.template.loaders.filesystem.load_template_source',
-#     'django.template.loaders.filesystem.Loader',
-#     #'django.template.loaders.app_directories.load_template_source',
-#     'django.template.loaders.app_directories.Loader',
-# )
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -90,12 +83,6 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'example_app.urls'
 
-# TEMPLATE_DIRS = (
-#     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-#     # Always use forward slashes, even on Windows.
-#     # Don't forget to use absolute paths, not relative paths.
-#     os.path.join(PROJECT_ROOT, 'templates')
-# )
 
 TEMPLATES = [
     {
@@ -120,8 +107,6 @@ TEMPLATES = [
     },
 ]
 
-print(os.path.join(PROJECT_ROOT, 'example_app', "templates"))
-
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -136,10 +121,7 @@ INSTALLED_APPS = (
 
 STATICFILES_DIRS = (
         os.path.join(PROJECT_ROOT, 'example_app', "static"),
-        #os.path.join(PROJECT_ROOT, "media"),
         )
-
-print(STATICFILES_DIRS)
 
 STATIC_URL = '/static/'
 

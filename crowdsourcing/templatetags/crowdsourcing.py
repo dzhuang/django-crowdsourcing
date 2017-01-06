@@ -358,7 +358,7 @@ def google_map(display, question, report, is_popup=False):
     if report.slug:
         kwargs["survey_report_slug"] = report.slug
     data_url = reverse(location_question_results, kwargs=kwargs)
-    img = '<img class="loading" src="/media/img/loading.gif" alt="loading" />'
+    img = '<img class="loading" src="/static/img/loading.gif" alt="loading" />'
     lat = number_to_javascript(display.map_center_latitude)
     lng = number_to_javascript(display.map_center_longitude)
     zoom = number_to_javascript(display.map_zoom)

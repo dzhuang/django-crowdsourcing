@@ -49,7 +49,7 @@ function setupMap(
 }
 
 function showSubmission(url, div_id, details_id) {
-  var img = '<img class="loading" src="/media/img/loading.gif" ' +
+  var img = '<img class="loading" src="/static/img/loading.gif" ' +
       'alt="loading" />';
   var details = $("#" + details_id);
   details.html(img);

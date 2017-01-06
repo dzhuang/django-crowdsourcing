@@ -33,7 +33,7 @@ ul li {
         margin: 0 5px;
 }
 
-.enlarge_link { background-image: url('/media/enlarge-icon.png'); }
+.enlarge_link { background-image: url('/static/img/enlarge-icon.png'); }
 
 #latest_survey_results_div {
 	border-top: 2px solid #ddd;
