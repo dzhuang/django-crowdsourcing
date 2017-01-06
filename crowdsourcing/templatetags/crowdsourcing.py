@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+import six
 import logging
 import re
 
@@ -54,7 +55,7 @@ register = template.Library()
 
 def yahoo_api():
     return mark_safe("\n".join([
-        '<script src="http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js"></script>',
+        '<script src="http://yui.yahooapis.com/2.8.1/build/yuiloader/yuiloader-min.js"></script>',
         '<style>',
         '  .chart_div { width: 600px; height: 300px; }',
         '</style>']))
@@ -91,7 +92,9 @@ def select_filter(wrapper_format, key, label, value, choices, blank=True):
         html.append('<option value="">---------</option>')
     for choice in choices:
         option_value = display = choice
-        if hasattr(choice, "__iter__"):
+        if (hasattr(choice, "__iter__")
+            and
+            not issubclass(type(choice), six.text_type)):
             option_value, display = choice[0], choice[1]
         option_value, display = strip_tags(option_value), strip_tags(display)
         html.append('<option value="%s"' % option_value)
