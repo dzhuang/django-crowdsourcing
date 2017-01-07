@@ -30,7 +30,8 @@ function loadMapsAndCharts() {
       }
     };
     if (!yahooChartAPILoaded) {
-      var loader = new YAHOO.util.YUILoader({
+      var Y = YUI();
+      var loader = new Y.Loader({
         require: ["charts"],
         onSuccess: onAPILoaded,
         combine: true

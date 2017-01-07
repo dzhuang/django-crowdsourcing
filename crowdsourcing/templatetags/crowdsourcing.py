@@ -55,7 +55,7 @@ register = template.Library()
 
 def yahoo_api():
     return mark_safe("\n".join([
-        '<script src="http://yui.yahooapis.com/2.8.1/build/yuiloader/yuiloader-min.js"></script>',
+        '<script src="http://yui.yahooapis.com/3.10.3/build/yui/yui-min.js"></script>',
         '<style>',
         '  .chart_div { width: 600px; height: 300px; }',
         '</style>']))
@@ -186,19 +186,24 @@ def yahoo_pie_chart(display, question, request_get, is_staff=False):
     args = {
         "answer_string": aggregate.yahoo_answer_string,
         "option_setup": "",
-        "chart_type": "PieChart",
-        "response_schema": '{fields: ["%s", "count"]}' % fieldname,
-        "options": "dataField: 'count', categoryField: '%s'" % fieldname,
-        "style": """
-            {padding: 20,
-             legend: {display: "right",
-                      padding: 10,
-                      spacing: 5,
-                      font: {family: "Arial",
-                             size: 13
-                            }
-                     }
-            }"""}
+        "chart_type": "pie",
+        #"response_schema": '{fields: ["%s", "count"]}' % fieldname,
+        "options": "seriesKeys: ['count'], categoryKey: '%s',"
+                   "seriesCollection:["
+                   "{"
+                   "  categoryKey:'%s',"
+                   "  valueKey:'count'"
+                   " }"
+                   "]" % (fieldname, fieldname),
+        "legend": """
+            {display: "right",
+             padding: 10,
+             spacing: 5,
+             font: {family: "Arial",
+                    size: 13
+                    }
+             }
+            """}
     id_args = (display.index_in_report(), question.id)
     return _yahoo_chart(display, "%d_%d" % id_args, args)
 register.simple_tag(yahoo_pie_chart)
@@ -265,7 +270,7 @@ def _yahoo_bar_line_chart_helper(display,
         return ""
     answer_string = aggregate.yahoo_answer_string
     series = []
-    series_format = '{displayName: "%s", yField: "%s", style: {size: 10}}'
+    series_format = '{displayName: "%s", yField: "%s", styles: {size: 10}}'
     if single_count:
         y_axis_label = "Count"
         fieldnames = ["count", x_axis.fieldname]
@@ -301,7 +306,7 @@ def _yahoo_bar_line_chart_helper(display,
         "option_setup": option_setup,
         "chart_type": chart_type,
         "response_schema": '{fields: [%s]}' % fieldnames_str,
-        "style": '{xAxis: {labelRotation: -45}, yAxis: {titleRotation: -90}}',
+        "styles": '{xAxis: {labelRotation: -45}, yAxis: {titleRotation: -90}}',
         "options": options}
     return_value.append(_yahoo_chart(display, str(index), args))
     for question in y_axes:
@@ -317,34 +322,51 @@ def _yahoo_chart(display, unique_id, args):
     out = [
         '<h2 class="chart_title">%s</h2>' % display.annotation,
         '<div class="chart_div" id="chart%s">' % unique_id,
-        'Unable to load Flash content. The YUI Charts Control ',
-        'requires Flash Player 9.0.45 or higher. You can install the ',
-        'latest version at the ',
-        '<a href="http://www.adobe.com/go/getflashplayer">',
-        'Adobe Flash Player Download Center</a>.',
+        # 'Unable to load Flash content. The YUI Charts Control ',
+        # 'requires Flash Player 9.0.45 or higher. You can install the ',
+        # 'latest version at the ',
+        # '<a href="http://www.adobe.com/go/getflashplayer">',
+        # 'Adobe Flash Player Download Center</a>.',
         '</div>']
     args.update(
         data_var='data%s' % unique_id,
         div_id="chart%s" % unique_id)
     script = """
         <script type="text/javascript">
-          yahooChartCallbacks.push(function() {
-            YAHOO.widget.Chart.SWFURL =
-              "http://yui.yahooapis.com/2.8.0r4/build/charts/assets/charts.swf";
+        yahooChartCallbacks.push(function() {
+            YUI().use('charts-legend', function (Y)
+        {
+            // Create data
             var answerData = %(answer_string)s;
-            var %(data_var)s = new YAHOO.util.DataSource(answerData);
-            %(data_var)s.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
-            %(data_var)s.responseSchema = %(response_schema)s;
             %(option_setup)s
-            var %(div_id)s = new YAHOO.widget.%(chart_type)s(
-              "%(div_id)s",
-              %(data_var)s,
-              {%(options)s,
-  
-               style: %(style)s,
-               expressInstall: "assets/expressinstall.swf"});
-          });
+            var %(div_id)s = new Y.Chart({
+                    render:"#%(div_id)s",
+                    %(options)s,
+                    dataProvider:answerData,
+                    type:"%(chart_type)s",
+                    legend: %(legend)s,
+                });
+        });});
         </script>""" % args
+    # script = """
+    #     <script type="text/javascript">
+    #       yahooChartCallbacks.push(function() {
+    #         YAHOO.widget.Chart.SWFURL =
+    #           "http://yui.yahooapis.com/2.8.0r4/build/charts/assets/charts.swf";
+    #         var answerData = %(answer_string)s;
+    #         var %(data_var)s = new YAHOO.util.DataSource(answerData);
+    #         %(data_var)s.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
+    #         %(data_var)s.responseSchema = %(response_schema)s;
+    #         %(option_setup)s
+    #         var %(div_id)s = new YAHOO.widget.%(chart_type)s(
+    #           "%(div_id)s",
+    #           %(data_var)s,
+    #           {%(options)s,
+    #
+    #            style: %(style)s,
+    #            expressInstall: "assets/expressinstall.swf"});
+    #       });
+    #     </script>""" % args
     out.append(script)
     return mark_safe("\n".join(out))
 
