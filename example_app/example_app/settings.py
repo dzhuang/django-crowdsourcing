@@ -15,16 +15,16 @@ DATABASE_PASSWORD = ''         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
-DATABASES = {
-    'default': {
-        'ENGINE': DATABASE_ENGINE,
-        'NAME': DATABASE_NAME,
-        'USER': DATABASE_USER,
-        'PASSWORD': DATABASE_PASSWORD,
-        'HOST': DATABASE_HOST,
-        'PORT': DATABASE_PORT,
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': DATABASE_ENGINE,
+#         'NAME': DATABASE_NAME,
+#         'USER': DATABASE_USER,
+#         'PASSWORD': DATABASE_PASSWORD,
+#         'HOST': DATABASE_HOST,
+#         'PORT': DATABASE_PORT,
+#     }
+# }
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -128,8 +128,9 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(PROJECT_ROOT, "static")
 
 try:
-    from local_settings import *
+    from .local_settings import *
 except ImportError:
     pass
 
+#from .local_settings import *
 

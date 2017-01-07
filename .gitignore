@@ -30,3 +30,4 @@ pip-log.txt
 *.swo
 *.swp
 /example_app/dev.db
+/example_app/example_app/local_settings.py
