@@ -15,7 +15,6 @@ try:
 except ImportError:
     import json
 
-from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
@@ -26,6 +25,7 @@ from django.db.models.query import EmptyQuerySet
 from decimal import Decimal
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
+from django.conf import settings
 
 
 from .fields import ImageWithThumbnailsField
@@ -764,7 +764,7 @@ BALLOT_STUFFING_FIELDS = ('ip_address', 'session_key',)
 
 class Submission(models.Model):
     survey = models.ForeignKey(Survey)
-    user = models.ForeignKey(User, blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     ip_address = models.GenericIPAddressField()
     submitted_at = models.DateTimeField(default=datetime.datetime.now)
     session_key = models.CharField(max_length=40, blank=True, editable=False)

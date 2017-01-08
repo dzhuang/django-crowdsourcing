@@ -1,5 +1,6 @@
 import itertools
 import re
+from django.utils.deconstruct import deconstructible
 
 from importlib import import_module
 
@@ -15,7 +16,7 @@ def get_function(path):
         raise ImportError(error.msg, to_exec)
     return got
 
-
+@deconstructible
 class ChoiceEnum(object):
     def __init__(self, choices):
         try:

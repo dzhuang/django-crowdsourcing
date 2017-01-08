@@ -1,3 +1,8 @@
+try:
+    from .local_settings import *
+except ImportError:
+    pass
+
 import re
 
 from django.conf import settings as _gs
