@@ -6,8 +6,11 @@
 # psycopg2>=2.0.8
 
 # oembed allows video embedding.
--e git+git://github.com/smulloni/python-oembed.git#egg=python-oembed
+python-oembed
 
 # You'll of course need django-crowdsourcing if you want to run the example
 # app. 
--e hg+https://django-crowdsourcing.googlecode.com/hg/#egg=crowdsourcing
+git+https://github.com/dzhuang/django-crowdsourcing.git
+
+# For bower to install js dependancies
+django_bower

@@ -73,6 +73,7 @@ ADMIN_MEDIA_PREFIX = '/media/admin/'
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '%n@##5o0%d@qd5l4^+(zt5ih@90a7ch4k3m7a^!5unw45)i=ly'
 
+from django.conf.global_settings import STATICFILES_FINDERS
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
@@ -115,9 +116,30 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.staticfiles',
     'django_forms_bootstrap',
+    "djangobower",
     'crowdsourcing',
     'cms',
 )
+
+
+BOWER_COMPONENTS_ROOT = os.path.join(PROJECT_ROOT, "components")
+
+STATICFILES_FINDERS = tuple(STATICFILES_FINDERS) + (
+    "djangobower.finders.BowerFinder",
+    )
+
+BOWER_INSTALLED_APPS = (
+    'jquery',
+    'bootstrap#3.3.7',
+    'jquery-form',
+    'jcarousel',
+    'bootstrap-datepicker',
+
+    # bower installed but failed yui
+    #'yui3'
+)
+
+
 
 STATICFILES_DIRS = (
         os.path.join(PROJECT_ROOT, 'example_app', "static"),
