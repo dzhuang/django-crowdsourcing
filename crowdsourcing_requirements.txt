@@ -36,3 +36,6 @@ flickrapi
 
 # templating
 django_forms_bootstrap
+
+# For bower to install js dependancies
+django_bower

@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 import six
+from six.moves.urllib.parse import urljoin
 import logging
 import re
 
@@ -55,14 +56,15 @@ register = template.Library()
 
 def yahoo_api():
     return mark_safe("\n".join([
-        '<script src="http://yui.yahooapis.com/3.10.3/build/yui/yui-min.js"></script>',
+        # Failed to use bower to load this.
+        '<script src="http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js"></script>',
         '<style>',
         '  .chart_div { width: 600px; height: 300px; }',
         '</style>']))
 register.simple_tag(yahoo_api)
 
 
-def jquery_and_google_api():
+def google_map_api():
     key = ""
     if local_settings.GOOGLE_MAPS_API_KEY:
         key = '?key=%s' % local_settings.GOOGLE_MAPS_API_KEY
@@ -70,12 +72,8 @@ def jquery_and_google_api():
         '<script type="text/javascript" src="http://www.google.com/jsapi',
         key,
         '"></script>'])
-    return mark_safe("\n".join([
-        jsapi,
-        '<script type="text/javascript">',
-        '  google.load("jquery", "1.7");',
-        '</script>']))
-register.simple_tag(jquery_and_google_api)
+    return mark_safe(jsapi)
+register.simple_tag(google_map_api)
 
 
 def filter(wrapper_format, key, label, html):

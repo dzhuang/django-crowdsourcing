@@ -147,6 +147,8 @@ Both the example application and WNYC's website, crowdsourcing's flagship site, 
 
 survey.js uses different markup for surveys that consist of a single choice type question. This markup allows you to enter such a survey with a single click.
 
+What's more, use ``python manage.py bower_install`` to install dependent js libraries.
+
 Template Tags
 =============
 
@@ -156,9 +158,9 @@ These are the more important template tags. For a complete list, view the source
 
 YUI charts and graphs are pretty slick. The example app is set up to do pie, bar, and line charts using YUI. You will want this tag in your page header to enable YUI.
 
-**jquery_and_google_api()**
+**google_map_api()**
 
-Make sure you set the CROWDSOURCING_GOOGLE_MAPS_API_KEY setting discussed below in Settings. Put this tag in your header to load both the Google Maps API and jQuery.
+Make sure you set the CROWDSOURCING_GOOGLE_MAPS_API_KEY setting discussed below in Settings. 
 
 **filters_as_ul(filters)**
 
